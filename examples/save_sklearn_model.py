@@ -20,11 +20,16 @@ MODEL_NAME = "sandbox-sklearn-logreg"
 def main() -> None:
     client = ArtifactMgmtClient(stage=STAGE)
 
-    # Train a tiny model
-    X = np.array([[0, 0], [1, 0], [0, 1], [1, 1]])
-    y = np.array([0, 0, 0, 1])
-    model = LogisticRegression().fit(X, y)
+    # Train a tiny but clearly separable model
+    # Class 0: points near origin; class 1: points far from origin
+    X_train = np.array([[0.1, 0.1], [0.2, 0.1], [0.1, 0.2], [0.2, 0.2],
+                        [0.9, 0.9], [0.8, 0.9], [0.9, 0.8], [0.8, 0.8]])
+    y_train = np.array([0, 0, 0, 0, 1, 1, 1, 1])
+    model = LogisticRegression().fit(X_train, y_train)
     print(f"Trained LogisticRegression: classes={model.classes_}")
+
+    X_test = np.array([[0.0, 0.0], [0.15, 0.15], [0.85, 0.85], [1.0, 1.0]])
+    expected = [0, 0, 1, 1]
 
     # Create model record
     try:
@@ -41,9 +46,9 @@ def main() -> None:
     print(f"Loaded artifact: {artifact}")
 
     # Predict
-    predictions = artifact.predict(X)
-    print(f"Predictions: {predictions}")
-    assert list(predictions) == [0, 0, 0, 1]
+    predictions = artifact.predict(X_test)
+    print(f"Predictions: {list(predictions)}  (expected {expected})")
+    assert list(predictions) == expected
     print("Predictions correct.")
 
     # Cleanup
