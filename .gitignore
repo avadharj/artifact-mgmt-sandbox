@@ -1,0 +1,41 @@
+# Virtual environments — never commit these; they're machine-specific and large
+.venv/
+venv/
+env/
+
+# Python bytecode — generated automatically, no source value
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution and packaging artifacts
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Test and coverage outputs
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.pytest_cache/
+
+# Linter/type-checker caches
+.ruff_cache/
+.mypy_cache/
+
+# Environment variable files — may contain credentials
+.env
+.envrc
+
+# macOS metadata
+.DS_Store
+
+# Editor directories
+.idea/
+.vscode/
+
+# Claude Code workspace files
+.claude/
+CLAUDE.md
