@@ -12,6 +12,7 @@ from __future__ import annotations
 import hashlib
 import base64
 import os
+import uuid
 import requests
 
 from artifact_mgmt import ArtifactMgmtClient, DepSnapshot, FrameworkInfo
@@ -45,7 +46,7 @@ def main() -> None:
     checksum = base64.b64encode(hashlib.sha256(data).digest()).decode()
     version_obj = client._create_version(
         MODEL_NAME,
-        idempotency_key="sandbox-crud-demo-key-001",
+        idempotency_key=str(uuid.uuid4()),
         dep_snapshot=FAKE_SNAPSHOT,
         checksum_sha256=checksum,
     )
@@ -53,11 +54,15 @@ def main() -> None:
     print(f"   Upload URL: {version_obj.upload_url[:60]}...")
 
     # 3. Upload bytes directly to presigned URL
+    # x-amz-checksum-sha256 is signed into the presigned URL by the backend and must be sent
     print("3. S3 PUT (presigned upload)")
     resp = requests.put(
         version_obj.upload_url,
         data=data,
-        headers={"Content-Type": "application/octet-stream"},
+        headers={
+            "Content-Type": "application/octet-stream",
+            "x-amz-checksum-sha256": checksum,
+        },
     )
     resp.raise_for_status()
     print(f"   Upload status: {resp.status_code}")
